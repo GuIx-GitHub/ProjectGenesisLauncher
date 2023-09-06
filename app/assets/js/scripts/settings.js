@@ -339,8 +339,8 @@ settingsNavDone.onclick = () => {
  * Account Management Tab
  */
 
-const msftLoginLogger = LoggerUtil.getLogger('Microsoft Login')
-const msftLogoutLogger = LoggerUtil.getLogger('Microsoft Logout')
+const msftLoginLogger = LoggerUtil.getLogger('Connexion Microsoft')
+const msftLogoutLogger = LoggerUtil.getLogger('Déconnexion Microsoft')
 
 // Bind the add mojang account button.
 document.getElementById('settingsAddMojangAccount').onclick = (e) => {
@@ -368,14 +368,14 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
 
             if(arguments_[1] === MSFT_ERROR.NOT_FINISHED) {
                 // User cancelled.
-                msftLoginLogger.info('Login cancelled by user.')
+                msftLoginLogger.info('Connexion annulée par l\'utilisateur.')
                 return
             }
 
             // Unexpected error.
             setOverlayContent(
-                'Something Went Wrong',
-                'Microsoft authentication failed. Please try again.',
+                'Quelque chose n\'a pas fonctionné',
+                'L\'authentification Microsoft a échoué. Veuillez réessayer.',
                 'OK'
             )
             setOverlayHandler(() => {
@@ -430,8 +430,8 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
                         // Uh oh.
                         msftLoginLogger.error('Unhandled error during login.', displayableError)
                         actualDisplayableError = {
-                            title: 'Unknown Error During Login',
-                            desc: 'An unknown error has occurred. Please see the console for details.'
+                            title: 'Erreur inconnue lors de la connexion',
+                            desc: 'Une erreur inconnue s\'est produite. Veuillez consulter la console pour plus de détails.'
                         }
                     }
 
@@ -461,11 +461,11 @@ function bindAuthAccountSelect(){
             for(let i=0; i<selectBtns.length; i++){
                 if(selectBtns[i].hasAttribute('selected')){
                     selectBtns[i].removeAttribute('selected')
-                    selectBtns[i].innerHTML = 'Select Account'
+                    selectBtns[i].innerHTML = 'Sélectionner un compte'
                 }
             }
             val.setAttribute('selected', '')
-            val.innerHTML = 'Selected Account &#10004;'
+            val.innerHTML = 'Compte sélectionné &#10004;'
             setSelectedAccount(val.closest('.settingsAuthAccount').getAttribute('uuid'))
         }
     })
@@ -483,7 +483,7 @@ function bindAuthAccountLogOut(){
             if(Object.keys(ConfigManager.getAuthAccounts()).length === 1){
                 isLastAccount = true
                 setOverlayContent(
-                    'Warning<br>This is Your Last Account',
+                    'Avertissement<br>C\'est votre dernier compte',
                     'In order to use the launcher you must be logged into at least one account. You will need to login again after.<br><br>Are you sure you want to log out?',
                     'I\'m Sure',
                     'Cancel'
