@@ -25,6 +25,7 @@
   "dependencies": {
     "@electron/remote": "^2.0.10",
     "adm-zip": "^0.5.9",
+    "discord-rpc": "^4.0.1",
     "discord-rpc-patch": "^4.0.1",
     "ejs": "^3.1.9",
     "ejs-electron": "^2.1.1",

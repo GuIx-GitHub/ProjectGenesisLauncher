@@ -46,6 +46,29 @@ function initAutoUpdater(event, data) {
     }) 
 }
 
+// Discord RPC.
+const appID = '1148240467352363048';
+const DiscordRPC = require('discord-rpc');
+const RPC = new DiscordRPC.Client({ transport: 'ipc' });
+
+DiscordRPC.register(appID);
+
+async function activity() {
+    if (!RPC) return;
+
+    RPC.setActivity({
+        details: "Joue à Project Genesis",
+        state: "Project Genesis Launcher",
+        largeImageKey: 'projectgenesis',
+    });
+}
+
+RPC.on('ready', async () => {
+    activity();
+});
+
+RPC.login({ clientId: appID });
+
 // Open channel to listen for update actions.
 ipcMain.on('autoUpdateAction', (event, arg, data) => {
     switch(arg){
