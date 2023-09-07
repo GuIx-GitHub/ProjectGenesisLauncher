@@ -45,13 +45,13 @@ function onDistroLoad(data){
 // Ensure Distribution is downloaded and cached.
 DistroAPI.getDistribution()
     .then(heliosDistro => {
-        logger.info('Loaded distribution index.')
+        logger.info('Indice de distribution en charge.')
 
         onDistroLoad(heliosDistro)
     })
     .catch(err => {
-        logger.info('Failed to load an older version of the distribution index.')
-        logger.info('Application cannot run.')
+        logger.info('Échec du chargement d\'une ancienne version de l\'index de distribution.')
+        logger.info('L\'application ne peut pas fonctionner.')
         logger.error(err)
 
         onDistroLoad(null)
@@ -60,8 +60,8 @@ DistroAPI.getDistribution()
 // Clean up temp dir incase previous launches ended unexpectedly. 
 fs.remove(path.join(os.tmpdir(), ConfigManager.getTempNativeFolder()), (err) => {
     if(err){
-        logger.warn('Error while cleaning natives directory', err)
+        logger.warn('Erreur lors du nettoyage du répertoire natives', err)
     } else {
-        logger.info('Cleaned natives directory.')
+        logger.info('Nettoyage du répertoire natives.')
     }
 })

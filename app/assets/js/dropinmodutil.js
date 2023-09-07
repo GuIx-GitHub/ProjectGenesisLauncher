@@ -101,7 +101,7 @@ exports.deleteDropinMod = async function(modsDir, fullName){
 
     if(!res.result) {
         shell.beep()
-        console.error('Error deleting drop-in mod.', res.error)
+        console.error('Erreur lors de la suppression du mod drop-in.', res.error)
         return false
     }
 
@@ -156,7 +156,7 @@ exports.scanForShaderpacks = function(instanceDir){
     const shaderDir = path.join(instanceDir, SHADER_DIR)
     const packsDiscovered = [{
         fullName: 'OFF',
-        name: 'Off (Default)'
+        name: 'Off (Par défaut)'
     }]
     if(fs.existsSync(shaderDir)){
         let modCandidates = fs.readdirSync(shaderDir)
@@ -191,7 +191,7 @@ exports.getEnabledShaderpack = function(instanceDir){
         if(match != null){
             return match[1]
         } else {
-            console.warn('WARNING: Shaderpack regex failed.')
+            console.warn('WARNING : Shaderpack regex failed (Échec de l\'utilisation de la regex dans les shaders).')
         }
     }
     return 'OFF'

@@ -233,16 +233,16 @@ function setServerListingHandlers(){
     const listings = Array.from(document.getElementsByClassName('serverListing'))
     listings.map((val) => {
         val.onclick = e => {
-            if(val.hasAttribute('selected')){
+            if(val.hasAttribute('sélectionné')){
                 return
             }
             const cListings = document.getElementsByClassName('serverListing')
             for(let i=0; i<cListings.length; i++){
-                if(cListings[i].hasAttribute('selected')){
-                    cListings[i].removeAttribute('selected')
+                if(cListings[i].hasAttribute('sélectionné')){
+                    cListings[i].removeAttribute('sélectionné')
                 }
             }
-            val.setAttribute('selected', '')
+            val.setAttribute('sélectionné', '')
             document.activeElement.blur()
         }
     })
@@ -257,11 +257,11 @@ function setAccountListingHandlers(){
             }
             const cListings = document.getElementsByClassName('accountListing')
             for(let i=0; i<cListings.length; i++){
-                if(cListings[i].hasAttribute('selected')){
-                    cListings[i].removeAttribute('selected')
+                if(cListings[i].hasAttribute('sélectionné')){
+                    cListings[i].removeAttribute('sélectionné')
                 }
             }
-            val.setAttribute('selected', '')
+            val.setAttribute('sélectionné', '')
             document.activeElement.blur()
         }
     })
@@ -304,7 +304,7 @@ function populateAccountListings(){
     const accounts = Array.from(Object.keys(accountsObj), v=>accountsObj[v])
     let htmlString = ''
     for(let i=0; i<accounts.length; i++){
-        htmlString += `<button class="accountListing" uuid="${accounts[i].uuid}" ${i===0 ? 'selected' : ''}>
+        htmlString += `<button class="accountListing" uuid="${accounts[i].uuid}" ${i===0 ? 'sélectionné' : ''}>
             <img src="https://mc-heads.net/head/${accounts[i].uuid}/40">
             <div class="accountListingName">${accounts[i].displayName}</div>
         </button>`
