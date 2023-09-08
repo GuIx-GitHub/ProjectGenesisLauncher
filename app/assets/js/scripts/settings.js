@@ -60,7 +60,7 @@ function bindFileSelectors(){
             if(isJavaExecSel && process.platform === 'win32') {
                 options.filters = [
                     { name: 'Executables', extensions: ['exe'] },
-                    { name: 'Tous les dossiers', extensions: ['*'] }
+                    { name: 'All Files', extensions: ['*'] }
                 ]
             }
 
@@ -269,16 +269,16 @@ function setupSettingsTabs(){
  * @param {boolean} fade Optional. True to fade transition.
  */
 function settingsNavItemListener(ele, fade = true){
-    if(ele.hasAttribute('sélectionné')){
+    if(ele.hasAttribute('selected')){
         return
     }
     const navItems = document.getElementsByClassName('settingsNavItem')
     for(let i=0; i<navItems.length; i++){
-        if(navItems[i].hasAttribute('sélectionné')){
-            navItems[i].removeAttribute('sélectionné')
+        if(navItems[i].hasAttribute('selected')){
+            navItems[i].removeAttribute('selected')
         }
     }
-    ele.setAttribute('sélectionné', '')
+    ele.setAttribute('selected', '')
     let prevTab = selectedSettingsTab
     selectedSettingsTab = ele.getAttribute('rSc')
 
@@ -339,8 +339,8 @@ settingsNavDone.onclick = () => {
  * Account Management Tab
  */
 
-const msftLoginLogger = LoggerUtil.getLogger('Connexion Microsoft')
-const msftLogoutLogger = LoggerUtil.getLogger('Déconnexion Microsoft')
+const msftLoginLogger = LoggerUtil.getLogger('Microsoft Login')
+const msftLogoutLogger = LoggerUtil.getLogger('Microsoft Logout')
 
 // Bind the add mojang account button.
 document.getElementById('settingsAddMojangAccount').onclick = (e) => {
@@ -368,14 +368,14 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
 
             if(arguments_[1] === MSFT_ERROR.NOT_FINISHED) {
                 // User cancelled.
-                msftLoginLogger.info('Connexion annulée par l\'utilisateur.')
+                msftLoginLogger.info('Login cancelled by user.')
                 return
             }
 
             // Unexpected error.
             setOverlayContent(
-                'Quelque chose n\'a pas fonctionné',
-                'L\'authentification Microsoft a échoué. Veuillez réessayer.',
+                'Something Went Wrong',
+                'Microsoft authentication failed. Please try again.',
                 'OK'
             )
             setOverlayHandler(() => {
@@ -394,10 +394,10 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
                 // This is probably if you messed up the app registration with Azure.      
                 let error = queryMap.error // Error might be 'access_denied' ?
                 let errorDesc = queryMap.error_description
-                console.log('Erreur dans l\'obtention du code d\'authentification, l\'application Azure est-elle correctement enregistrée ?')
+                console.log('Error getting authCode, is Azure application registered correctly?')
                 console.log(error)
                 console.log(errorDesc)
-                console.log('Carte d\'interrogation complète: ', queryMap)
+                console.log('Full query map: ', queryMap)
                 setOverlayContent(
                     error,
                     errorDesc,
@@ -411,7 +411,7 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
             })
         } else {
 
-            msftLoginLogger.info('Code d\'authentification acquis, poursuite de l\'authentification.')
+            msftLoginLogger.info('Acquired authCode, proceeding with authentication.')
 
             const authCode = queryMap.code
             AuthManager.addMicrosoftAccount(authCode).then(value => {
@@ -424,14 +424,14 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
 
                     let actualDisplayableError
                     if(isDisplayableError(displayableError)) {
-                        msftLoginLogger.error('Erreur lors de la connexion.', displayableError)
+                        msftLoginLogger.error('Error while logging in.', displayableError)
                         actualDisplayableError = displayableError
                     } else {
                         // Uh oh.
-                        msftLoginLogger.error('Erreur non gérée lors de la connexion.', displayableError)
+                        msftLoginLogger.error('Unhandled error during login.', displayableError)
                         actualDisplayableError = {
-                            title: 'Erreur inconnue lors de la connexion',
-                            desc: 'Une erreur inconnue s\'est produite. Veuillez consulter la console pour plus de détails.'
+                            title: 'Unknown Error During Login',
+                            desc: 'An unknown error has occurred. Please see the console for details.'
                         }
                     }
 
@@ -454,18 +454,18 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
 function bindAuthAccountSelect(){
     Array.from(document.getElementsByClassName('settingsAuthAccountSelect')).map((val) => {
         val.onclick = (e) => {
-            if(val.hasAttribute('sélectionné')){
+            if(val.hasAttribute('selected')){
                 return
             }
             const selectBtns = document.getElementsByClassName('settingsAuthAccountSelect')
             for(let i=0; i<selectBtns.length; i++){
-                if(selectBtns[i].hasAttribute('sélectionné')){
-                    selectBtns[i].removeAttribute('sélectionné')
-                    selectBtns[i].innerHTML = 'Sélectionner un compte'
+                if(selectBtns[i].hasAttribute('selected')){
+                    selectBtns[i].removeAttribute('selected')
+                    selectBtns[i].innerHTML = 'Select Account'
                 }
             }
-            val.setAttribute('sélectionné', '')
-            val.innerHTML = 'Compte sélectionné &#10004;'
+            val.setAttribute('selected', '')
+            val.innerHTML = 'Selected Account &#10004;'
             setSelectedAccount(val.closest('.settingsAuthAccount').getAttribute('uuid'))
         }
     })
@@ -483,7 +483,7 @@ function bindAuthAccountLogOut(){
             if(Object.keys(ConfigManager.getAuthAccounts()).length === 1){
                 isLastAccount = true
                 setOverlayContent(
-                    'Avertissement<br>C\'est votre dernier compte',
+                    'Warning<br>This is Your Last Account',
                     'In order to use the launcher you must be logged into at least one account. You will need to login again after.<br><br>Are you sure you want to log out?',
                     'I\'m Sure',
                     'Cancel'
@@ -549,14 +549,14 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGOUT, (_, ...arguments_) => {
 
             if(arguments_.length > 1 && arguments_[1] === MSFT_ERROR.NOT_FINISHED) {
                 // User cancelled.
-                msftLogoutLogger.info('Déconnexion annulée par l\'utilisateur.')
+                msftLogoutLogger.info('Logout cancelled by user.')
                 return
             }
 
             // Unexpected error.
             setOverlayContent(
-                'Quelque chose n\'a pas fonctionné',
-                'La déconnexion Microsoft a échoué. Veuillez réessayer.',
+                'Something Went Wrong',
+                'Microsoft logout failed. Please try again.',
                 'OK'
             )
             setOverlayHandler(() => {
@@ -570,7 +570,7 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGOUT, (_, ...arguments_) => {
         const isLastAccount = arguments_[2]
         const prevSelAcc = ConfigManager.getSelectedAccount()
 
-        msftLogoutLogger.info('Déconnexion réussie. uuid:', uuid)
+        msftLogoutLogger.info('Logout Successful. uuid:', uuid)
         
         AuthManager.removeMicrosoftAccount(uuid)
             .then(() => {
@@ -610,13 +610,13 @@ function refreshAuthAccountSelected(uuid){
     Array.from(document.getElementsByClassName('settingsAuthAccount')).map((val) => {
         const selBtn = val.getElementsByClassName('settingsAuthAccountSelect')[0]
         if(uuid === val.getAttribute('uuid')){
-            selBtn.setAttribute('sélectionné', '')
-            selBtn.innerHTML = 'Sélectionner un compte &#10004;'
+            selBtn.setAttribute('selected', '')
+            selBtn.innerHTML = 'Selected Account &#10004;'
         } else {
-            if(selBtn.hasAttribute('sélectionné')){
-                selBtn.removeAttribute('sélectionné')
+            if(selBtn.hasAttribute('selected')){
+                selBtn.removeAttribute('selected')
             }
-            selBtn.innerHTML = 'Sélectionner un compte'
+            selBtn.innerHTML = 'Select Account'
         }
     })
 }
@@ -767,7 +767,7 @@ function parseModulesForUI(mdls, submodules, servConf){
                 const conf = servConf[mdl.getVersionlessMavenIdentifier()]
                 const val = typeof conf === 'object' ? conf.value : conf
 
-                optMods += `<div id="${mdl.getVersionlessMavenIdentifier()}" class="settingsBaseMod settings${submodules ? 'Sous' : ''}Mod" ${val ? 'activée' : ''}>
+                optMods += `<div id="${mdl.getVersionlessMavenIdentifier()}" class="settingsBaseMod settings${submodules ? 'Sub' : ''}Mod" ${val ? 'enabled' : ''}>
                     <div class="settingsModContent">
                         <div class="settingsModMainWrapper">
                             <div class="settingsModStatus"></div>
@@ -901,8 +901,8 @@ function bindDropinModsRemoveButton(){
                 document.getElementById(fullName).remove()
             } else {
                 setOverlayContent(
-                    `Échec de la suppression<br>Drop-in Mod ${fullName}`,
-                    'Assurez-vous que le fichier n\'est pas en cours d\'utilisation et réessayez..',
+                    `Failed to Delete<br>Drop-in Mod ${fullName}`,
+                    'Make sure the file is not in use and try again.',
                     'Okay'
                 )
                 setOverlayHandler(null)
@@ -956,7 +956,7 @@ function saveDropinModConfiguration(){
                 DropinModUtil.toggleDropinMod(CACHE_SETTINGS_MODS_DIR, dropin.fullName, dropinUIEnabled).catch(err => {
                     if(!isOverlayVisible()){
                         setOverlayContent(
-                            'Échec du basculement<br>Un ou plus Mods Drop-in',
+                            'Failed to Toggle<br>One or More Drop-in Mods',
                             err.message,
                             'Okay'
                         )
@@ -1103,7 +1103,7 @@ async function loadSelectedServerOnModsTab(){
 
 // Bind functionality to the server switch button.
 Array.from(document.getElementsByClassName('settingsSwitchServerButton')).forEach(el => {
-    el.addEventListener('cliquer', async e => {
+    el.addEventListener('click', async e => {
         e.target.blur()
         await toggleServerSelection(true)
     })
@@ -1249,7 +1249,7 @@ function bindRangeSlider(){
         const track = v.getElementsByClassName('rangeSliderTrack')[0]
 
         // Set the initial slider value.
-        const value = v.getAttribute('valeur')
+        const value = v.getAttribute('value')
         const sliderMeta = calculateRangeSliderMeta(v)
 
         updateRangedSlider(v, value, ((value-sliderMeta.min)/sliderMeta.step)*sliderMeta.inc)
@@ -1295,11 +1295,11 @@ function bindRangeSlider(){
  * @param {number} notch The notch that the slider should now be at.
  */
 function updateRangedSlider(element, value, notch){
-    const oldVal = element.getAttribute('valeur')
+    const oldVal = element.getAttribute('value')
     const bar = element.getElementsByClassName('rangeSliderBar')[0]
     const track = element.getElementsByClassName('rangeSliderTrack')[0]
     
-    element.setAttribute('valeur', value)
+    element.setAttribute('value', value)
 
     if(notch < 0){
         notch = 0
@@ -1320,7 +1320,7 @@ function updateRangedSlider(element, value, notch){
         track.style.left = notch + '%'
         bar.style.width = notch + '%'
     } else {
-        element.setAttribute('valeur', oldVal)
+        element.setAttribute('value', oldVal)
     }
 }
 
@@ -1344,19 +1344,19 @@ async function populateJavaExecDetails(execPath){
     const details = await validateSelectedJvm(ensureJavaDirIsRoot(execPath), server.effectiveJavaOptions.supported)
 
     if(details != null) {
-        settingsJavaExecDetails.innerHTML = `Sélectionné : Java ${details.semverStr} (${details.vendor})`
+        settingsJavaExecDetails.innerHTML = `Selected: Java ${details.semverStr} (${details.vendor})`
     } else {
-        settingsJavaExecDetails.innerHTML = 'Sélection non valide'
+        settingsJavaExecDetails.innerHTML = 'Invalid Selection'
     }
 }
 
 function populateJavaReqDesc(server) {
-    settingsJavaReqDesc.innerHTML = `Nécessite Java ${server.effectiveJavaOptions.suggestedMajor} x64.`
+    settingsJavaReqDesc.innerHTML = `Requires Java ${server.effectiveJavaOptions.suggestedMajor} x64.`
 }
 
 function populateJvmOptsLink(server) {
     const major = server.effectiveJavaOptions.suggestedMajor
-    settingsJvmOptsLink.innerHTML = `Options disponibles pour Java ${major} (HotSpot VM)`
+    settingsJvmOptsLink.innerHTML = `Available Options for Java ${major} (HotSpot VM)`
     if(major >= 12) {
         settingsJvmOptsLink.href = `https://docs.oracle.com/en/java/javase/${major}/docs/specs/man/java.html#extra-options-for-java`
     }
@@ -1433,11 +1433,11 @@ function isPrerelease(version){
 function populateVersionInformation(version, valueElement, titleElement, checkElement){
     valueElement.innerHTML = version
     if(isPrerelease(version)){
-        titleElement.innerHTML = 'Pré-version'
+        titleElement.innerHTML = 'Pre-release'
         titleElement.style.color = '#ff886d'
         checkElement.style.background = '#ff886d'
     } else {
-        titleElement.innerHTML = 'Version stable'
+        titleElement.innerHTML = 'Stable Release'
         titleElement.style.color = null
         checkElement.style.background = null
     }
@@ -1476,7 +1476,7 @@ function populateReleaseNotes(){
         },
         timeout: 2500
     }).catch(err => {
-        settingsAboutChangelogText.innerHTML = 'Échec du chargement des notes de mise à jour.'
+        settingsAboutChangelogText.innerHTML = 'Failed to load release notes.'
     })
 }
 
@@ -1524,27 +1524,27 @@ function settingsUpdateButtonStatus(text, disabled = false, handler = null){
  */
 function populateSettingsUpdateInformation(data){
     if(data != null){
-        settingsUpdateTitle.innerHTML = `Nouveau ${isPrerelease(data.version) ? 'Pré-version' : 'Version'} Disponible`
+        settingsUpdateTitle.innerHTML = `New ${isPrerelease(data.version) ? 'Pre-release' : 'Release'} Available`
         settingsUpdateChangelogCont.style.display = null
         settingsUpdateChangelogTitle.innerHTML = data.releaseName
         settingsUpdateChangelogText.innerHTML = data.releaseNotes
         populateVersionInformation(data.version, settingsUpdateVersionValue, settingsUpdateVersionTitle, settingsUpdateVersionCheck)
         
         if(process.platform === 'darwin'){
-            settingsUpdateButtonStatus('Télécharger depuis GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Fermez le lanceur et exécutez le dmg pour mettre à jour.</span>', false, () => {
+            settingsUpdateButtonStatus('Download from GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Close the launcher and run the dmg to update.</span>', false, () => {
                 shell.openExternal(data.darwindownload)
             })
         } else {
-            settingsUpdateButtonStatus('Téléchargement..', true)
+            settingsUpdateButtonStatus('Downloading..', true)
         }
     } else {
-        settingsUpdateTitle.innerHTML = 'Vous utilisez la dernière version'
+        settingsUpdateTitle.innerHTML = 'You Are Running the Latest Version'
         settingsUpdateChangelogCont.style.display = 'none'
         populateVersionInformation(remote.app.getVersion(), settingsUpdateVersionValue, settingsUpdateVersionTitle, settingsUpdateVersionCheck)
-        settingsUpdateButtonStatus('Vérifier les mises à jour', false, () => {
+        settingsUpdateButtonStatus('Check for Updates', false, () => {
             if(!isDev){
                 ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
-                settingsUpdateButtonStatus('Vérification des mises à jour..', true)
+                settingsUpdateButtonStatus('Checking for Updates..', true)
             }
         })
     }
