@@ -1,6 +1,6 @@
 {
   "name": "projectgenesis",
-  "version": "2.0.5",
+  "version": "1.0.2",
   "productName": "Project Genesis",
   "description": "Launcher pour Project Genesis.",
   "author": "Daniel Scalzi (https://github.com/dscalzi/) and GuIx",
@@ -27,6 +27,7 @@
     "adm-zip": "^0.5.9",
     "discord-rpc": "^4.0.1",
     "discord-rpc-patch": "^4.0.1",
+    "discord.js": "^14.13.0",
     "ejs": "^3.1.9",
     "ejs-electron": "^2.1.1",
     "electron-updater": "^6.1.1",
@@ -35,7 +36,9 @@
     "got": "^11.8.5",
     "helios-core": "~2.0.5",
     "helios-distribution-types": "^1.2.0",
+    "howler": "^2.2.3",
     "jquery": "^3.7.0",
+    "play-sound": "^1.1.6",
     "semver": "^7.5.4"
   },
   "devDependencies": {

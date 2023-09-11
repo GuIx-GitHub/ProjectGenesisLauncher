@@ -1,6 +1,7 @@
 // Requirements
 const os     = require('os')
 const semver = require('semver')
+const Howler = require('howler')
 
 const DropinModUtil  = require('./assets/js/dropinmodutil')
 const { MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR } = require('./assets/js/ipcconstants')
@@ -310,6 +311,64 @@ function settingsNavItemListener(ele, fade = true){
     }
 }
 
+const musicSelector = document.getElementById('musicSelector');
+let audioBackground = null;
+let isMuted = false;
+
+function changeMusic() {
+  if (audioBackground) {
+
+    audioBackground.fade(0.1, 0, 1000);
+    setTimeout(() => {
+      audioBackground.stop();
+      audioBackground.unload();
+
+      audioBackground = new Howl({
+        src: [musicSelector.value],
+        loop: true,
+        volume: 0.5,
+      });
+
+      audioBackground.load();
+
+      audioBackground.play();
+      audioBackground.fade(0, 0.1, 1000);
+      audioBackground.volume(0.1);
+    }, 3000);
+  } else {
+    audioBackground = new Howl({
+      src: [musicSelector.value],
+      loop: true,
+      volume: 0.5,
+    });
+
+    audioBackground.load();
+
+    audioBackground.play();
+    audioBackground.fade(0, 0.1, 1000);
+    audioBackground.volume(0.1);
+  }
+}
+
+musicSelector.addEventListener('change', changeMusic);
+
+if (musicSelector.value) {
+  changeMusic();
+}
+
+const playButton = document.getElementById('playSoundButton');
+
+playButton.addEventListener('click', () => {
+    if (isMuted) {
+      audioBackground.volume(0.1);
+      playButton.innerHTML = '<span>🔊</span>';
+    } else {
+        audioBackground.volume(0.0);
+      playButton.innerHTML = '<span>🔇</span>';
+    }
+    isMuted = !isMuted;
+});
+
 const settingsNavDone = document.getElementById('settingsNavDone')
 
 /**
@@ -374,8 +433,8 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
 
             // Unexpected error.
             setOverlayContent(
-                'Something Went Wrong',
-                'Microsoft authentication failed. Please try again.',
+                'Quelque chose n\'a pas fonctionné',
+                'L\'authentification Microsoft a échoué. Veuillez réessayer.',
                 'OK'
             )
             setOverlayHandler(() => {
@@ -430,8 +489,8 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
                         // Uh oh.
                         msftLoginLogger.error('Unhandled error during login.', displayableError)
                         actualDisplayableError = {
-                            title: 'Unknown Error During Login',
-                            desc: 'An unknown error has occurred. Please see the console for details.'
+                            title: 'Erreur inconnue lors de la connexion',
+                            desc: 'Une erreur inconnue s\'est produite. Veuillez consulter la console pour plus de détails.'
                         }
                     }
 
@@ -461,11 +520,11 @@ function bindAuthAccountSelect(){
             for(let i=0; i<selectBtns.length; i++){
                 if(selectBtns[i].hasAttribute('selected')){
                     selectBtns[i].removeAttribute('selected')
-                    selectBtns[i].innerHTML = 'Select Account'
+                    selectBtns[i].innerHTML = 'Sélectionner un compte'
                 }
             }
             val.setAttribute('selected', '')
-            val.innerHTML = 'Selected Account &#10004;'
+            val.innerHTML = 'Compte sélectionné &#10004;'
             setSelectedAccount(val.closest('.settingsAuthAccount').getAttribute('uuid'))
         }
     })
@@ -483,10 +542,10 @@ function bindAuthAccountLogOut(){
             if(Object.keys(ConfigManager.getAuthAccounts()).length === 1){
                 isLastAccount = true
                 setOverlayContent(
-                    'Warning<br>This is Your Last Account',
-                    'In order to use the launcher you must be logged into at least one account. You will need to login again after.<br><br>Are you sure you want to log out?',
-                    'I\'m Sure',
-                    'Cancel'
+                    'Avertissement<br>C\'est votre dernier compte',
+                    'Pour utiliser le lanceur, vous devez être connecté à au moins un compte. Vous devrez vous connecter à nouveau après.<br><br>Êtes-vous sûr de vouloir vous déconnecter ?',
+                    'Je suis sûr',
+                    'Annuler'
                 )
                 setOverlayHandler(() => {
                     processLogOut(val, isLastAccount)
@@ -549,14 +608,14 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGOUT, (_, ...arguments_) => {
 
             if(arguments_.length > 1 && arguments_[1] === MSFT_ERROR.NOT_FINISHED) {
                 // User cancelled.
-                msftLogoutLogger.info('Logout cancelled by user.')
+                msftLogoutLogger.info('Déconnexion annulée par l\'utilisateur.')
                 return
             }
 
             // Unexpected error.
             setOverlayContent(
-                'Something Went Wrong',
-                'Microsoft logout failed. Please try again.',
+                'Quelque chose n\'a pas fonctionné',
+                'La déconnexion Microsoft a échoué. Veuillez réessayer.',
                 'OK'
             )
             setOverlayHandler(() => {
@@ -611,12 +670,12 @@ function refreshAuthAccountSelected(uuid){
         const selBtn = val.getElementsByClassName('settingsAuthAccountSelect')[0]
         if(uuid === val.getAttribute('uuid')){
             selBtn.setAttribute('selected', '')
-            selBtn.innerHTML = 'Selected Account &#10004;'
+            selBtn.innerHTML = 'Compte sélectionné &#10004;'
         } else {
             if(selBtn.hasAttribute('selected')){
                 selBtn.removeAttribute('selected')
             }
-            selBtn.innerHTML = 'Select Account'
+            selBtn.innerHTML = 'Sélectionner un compte'
         }
     })
 }
@@ -648,7 +707,7 @@ function populateAuthAccounts(){
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
                     <div class="settingsAuthAccountDetailPane">
-                        <div class="settingsAuthAccountDetailTitle">Username</div>
+                        <div class="settingsAuthAccountDetailTitle">Nom d'utilisateur</div>
                         <div class="settingsAuthAccountDetailValue">${acc.displayName}</div>
                     </div>
                     <div class="settingsAuthAccountDetailPane">
@@ -657,9 +716,9 @@ function populateAuthAccounts(){
                     </div>
                 </div>
                 <div class="settingsAuthAccountActions">
-                    <button class="settingsAuthAccountSelect" ${selectedUUID === acc.uuid ? 'selected>Selected Account &#10004;' : '>Select Account'}</button>
+                    <button class="settingsAuthAccountSelect" ${selectedUUID === acc.uuid ? 'selected>Compte sélectionné &#10004;' : '>Sélectionner un compte'}</button>
                     <div class="settingsAuthAccountWrapper">
-                        <button class="settingsAuthAccountLogOut">Log Out</button>
+                        <button class="settingsAuthAccountLogOut">Se déconnecter</button>
                     </div>
                 </div>
             </div>
@@ -873,7 +932,7 @@ async function resolveDropinModsForUI(){
                             <div class="settingsModDetails">
                                 <span class="settingsModName">${dropin.name}</span>
                                 <div class="settingsDropinRemoveWrapper">
-                                    <button class="settingsDropinRemoveButton" remmod="${dropin.fullName}">Remove</button>
+                                    <button class="settingsDropinRemoveButton" remmod="${dropin.fullName}">Retirer</button>
                                 </div>
                             </div>
                         </div>
@@ -901,8 +960,8 @@ function bindDropinModsRemoveButton(){
                 document.getElementById(fullName).remove()
             } else {
                 setOverlayContent(
-                    `Failed to Delete<br>Drop-in Mod ${fullName}`,
-                    'Make sure the file is not in use and try again.',
+                    `Échec de la suppression<br>Drop-in Mod ${fullName}`,
+                    'Assurez-vous que le fichier n\est pas en cours d\'utilisation et réessayez..',
                     'Okay'
                 )
                 setOverlayHandler(null)
@@ -956,7 +1015,7 @@ function saveDropinModConfiguration(){
                 DropinModUtil.toggleDropinMod(CACHE_SETTINGS_MODS_DIR, dropin.fullName, dropinUIEnabled).catch(err => {
                     if(!isOverlayVisible()){
                         setOverlayContent(
-                            'Failed to Toggle<br>One or More Drop-in Mods',
+                            'Échec du basculement<br>d`\'un ou plusieurs mods Drop-in',
                             err.message,
                             'Okay'
                         )
@@ -1093,7 +1152,7 @@ async function loadSelectedServerOnModsTab(){
                             <path class="cls-1" d="M100.93,65.54C89,62,68.18,55.65,63.54,52.13c2.7-5.23,18.8-19.2,28-27.55C81.36,31.74,63.74,43.87,58.09,45.3c-2.41-5.37-3.61-26.52-4.37-39-.77,12.46-2,33.64-4.36,39-5.7-1.46-23.3-13.57-33.49-20.72,9.26,8.37,25.39,22.36,28,27.55C39.21,55.68,18.47,62,6.52,65.55c12.32-2,33.63-6.06,39.34-4.9-.16,5.87-8.41,26.16-13.11,37.69,6.1-10.89,16.52-30.16,21-33.9,4.5,3.79,14.93,23.09,21,34C70,86.84,61.73,66.48,61.59,60.65,67.36,59.49,88.64,63.52,100.93,65.54Z"/>
                             <circle class="cls-2" cx="53.73" cy="53.9" r="38"/>
                         </svg>
-                        <span class="serverListingStarTooltip">Main Server</span>
+                        <span class="serverListingStarTooltip">Serveur principal</span>
                     </div>` : ''}
                 </div>
             </div>
@@ -1344,19 +1403,19 @@ async function populateJavaExecDetails(execPath){
     const details = await validateSelectedJvm(ensureJavaDirIsRoot(execPath), server.effectiveJavaOptions.supported)
 
     if(details != null) {
-        settingsJavaExecDetails.innerHTML = `Selected: Java ${details.semverStr} (${details.vendor})`
+        settingsJavaExecDetails.innerHTML = `Sélectionné : Java ${details.semverStr} (${details.vendor})`
     } else {
-        settingsJavaExecDetails.innerHTML = 'Invalid Selection'
+        settingsJavaExecDetails.innerHTML = 'Sélection invalide'
     }
 }
 
 function populateJavaReqDesc(server) {
-    settingsJavaReqDesc.innerHTML = `Requires Java ${server.effectiveJavaOptions.suggestedMajor} x64.`
+    settingsJavaReqDesc.innerHTML = `Nécessite Java ${server.effectiveJavaOptions.suggestedMajor} x64.`
 }
 
 function populateJvmOptsLink(server) {
     const major = server.effectiveJavaOptions.suggestedMajor
-    settingsJvmOptsLink.innerHTML = `Available Options for Java ${major} (HotSpot VM)`
+    settingsJvmOptsLink.innerHTML = `Options disponibles pour Java ${major} (HotSpot VM)`
     if(major >= 12) {
         settingsJvmOptsLink.href = `https://docs.oracle.com/en/java/javase/${major}/docs/specs/man/java.html#extra-options-for-java`
     }
@@ -1433,11 +1492,11 @@ function isPrerelease(version){
 function populateVersionInformation(version, valueElement, titleElement, checkElement){
     valueElement.innerHTML = version
     if(isPrerelease(version)){
-        titleElement.innerHTML = 'Pre-release'
+        titleElement.innerHTML = 'Préversion'
         titleElement.style.color = '#ff886d'
         checkElement.style.background = '#ff886d'
     } else {
-        titleElement.innerHTML = 'Stable Release'
+        titleElement.innerHTML = 'Version stable'
         titleElement.style.color = null
         checkElement.style.background = null
     }
@@ -1456,7 +1515,7 @@ function populateAboutVersionInformation(){
  */
 function populateReleaseNotes(){
     $.ajax({
-        url: 'https://github.com/dscalzi/HeliosLauncher/releases.atom',
+        url: 'https://github.com/GuIx-GitHub/ProjectGenesisLauncher/releases.atom',
         success: (data) => {
             const version = 'v' + remote.app.getVersion()
             const entries = $(data).find('entry')
@@ -1476,7 +1535,7 @@ function populateReleaseNotes(){
         },
         timeout: 2500
     }).catch(err => {
-        settingsAboutChangelogText.innerHTML = 'Failed to load release notes.'
+        settingsAboutChangelogText.innerHTML = 'Échec du chargement des notes de mise à jour.'
     })
 }
 
@@ -1524,27 +1583,27 @@ function settingsUpdateButtonStatus(text, disabled = false, handler = null){
  */
 function populateSettingsUpdateInformation(data){
     if(data != null){
-        settingsUpdateTitle.innerHTML = `New ${isPrerelease(data.version) ? 'Pre-release' : 'Release'} Available`
+        settingsUpdateTitle.innerHTML = `Nouvelle ${isPrerelease(data.version) ? 'Préversion' : 'Version'} Disponible`
         settingsUpdateChangelogCont.style.display = null
         settingsUpdateChangelogTitle.innerHTML = data.releaseName
         settingsUpdateChangelogText.innerHTML = data.releaseNotes
         populateVersionInformation(data.version, settingsUpdateVersionValue, settingsUpdateVersionTitle, settingsUpdateVersionCheck)
         
         if(process.platform === 'darwin'){
-            settingsUpdateButtonStatus('Download from GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Close the launcher and run the dmg to update.</span>', false, () => {
+            settingsUpdateButtonStatus('Télécharger depuis GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Fermez le lanceur et exécutez le dmg pour mettre à jour.</span>', false, () => {
                 shell.openExternal(data.darwindownload)
             })
         } else {
-            settingsUpdateButtonStatus('Downloading..', true)
+            settingsUpdateButtonStatus('Téléchargement..', true)
         }
     } else {
-        settingsUpdateTitle.innerHTML = 'You Are Running the Latest Version'
+        settingsUpdateTitle.innerHTML = 'Vous utilisez la dernière version'
         settingsUpdateChangelogCont.style.display = 'none'
         populateVersionInformation(remote.app.getVersion(), settingsUpdateVersionValue, settingsUpdateVersionTitle, settingsUpdateVersionCheck)
-        settingsUpdateButtonStatus('Check for Updates', false, () => {
+        settingsUpdateButtonStatus('Vérifier les mises à jour', false, () => {
             if(!isDev){
                 ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
-                settingsUpdateButtonStatus('Checking for Updates..', true)
+                settingsUpdateButtonStatus('Vérification des mises à jour..', true)
             }
         })
     }

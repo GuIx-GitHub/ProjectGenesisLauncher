@@ -14,6 +14,7 @@
                     <div class="settingsNavSpacer"></div>
                     <button class="settingsNavItem" rSc="settingsTabAbout">À propos</button>
                     <button class="settingsNavItem" rSc="settingsTabUpdate" id="settingsNavUpdate">Mises à jour</button>
+                    <button class="settingsNavItem" rSc="settingsTabSound">Audio</button>
                     <div id="settingsNavContentBottom">
                         <div class="settingsNavDivider"></div>
                         <button id="settingsNavDone">Terminé</button>
@@ -384,6 +385,52 @@
                         Pas de notes de mise à jour
                     </div>
                 </div>
+            </div>
+        </div>
+        <style>
+            /* Style de la combobox (sélecteur) */
+            #musicSelector {
+              width: 175px; /* Largeur personnalisée (100% pour remplir la largeur du conteneur) */
+              padding: 8px; /* Marge intérieure */
+              font-size: 16px; /* Taille de police */
+              background-color: #f0f0f000; /* Couleur de fond */
+              border: 1px solid #cccccc00; /* Bordure */
+              border-radius: 4px; /* Coins arrondis */
+              outline: none; /* Supprimer la bordure de focus */
+              cursor: pointer; /* Curseur de sélection */
+            }
+
+            #musicSelector option:sle {
+                background-color: #3399ff00; /* Couleur de fond de la sélection */
+                color: #ffffff00; /* Couleur du texte de la sélection */
+            }
+          
+            /* Style des options de la combobox */
+            #musicSelector option {
+              font-size: 14px; /* Taille de police des options */
+              padding: 4px 8px; /* Marge intérieure des options */
+              background-color: #ffffff00; /* Couleur de fond des options */
+            }
+          
+            /* Style des options lorsqu'elles sont survolées */
+            #musicSelector option:hover {
+              background-color: #e0e0e000; /* Couleur de fond au survol */
+            }
+        </style>
+        <div id="settingsTabSound" class="settingsTab" style="display: none;">
+            <div class="settingsTabHeader">
+                <span class="settingsTabHeaderText">Règlages de l'Audio</span>
+                <span class="settingsTabHeaderDesc">Les paramètres audio du lanceur.</span>
+            </div>
+            <div>
+                <span><button class="settingsNavItem" id="playSoundButton">🔊</button>Musique de fond</span>
+            </div>
+            <div>
+                <select class="settingsNavItem" id="musicSelector">
+                    <option value="C:\\Users\\GuIx\\Documents\\GitHub\\ProjectGenesisLauncher\\app\\assets\\sound\\Background1.mp3"><span>Project Genesis</span></option>
+                    <option value="C:\\Users\\GuIx\\Documents\\GitHub\\ProjectGenesisLauncher\\app\\assets\\sound\\Background2.mp3">Retro</option>
+                    <option value="C:\\Users\\GuIx\\Documents\\GitHub\\ProjectGenesisLauncher\\app\\assets\\sound\\Background3.mp3">Neo</option>
+                </select>
             </div>
         </div>
     </div>

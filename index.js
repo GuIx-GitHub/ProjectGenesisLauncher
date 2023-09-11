@@ -60,6 +60,7 @@ async function activity() {
         details: "Joue à Project Genesis",
         state: "Project Genesis Launcher",
         largeImageKey: 'projectgenesis',
+        startTimestamp: new Date().getTime(),
     });
 }
 
