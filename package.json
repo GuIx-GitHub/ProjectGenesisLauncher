@@ -1,9 +1,9 @@
 {
   "name": "projectgenesis",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "productName": "Project Genesis",
   "description": "Launcher pour Project Genesis.",
-  "author": "Daniel Scalzi (https://github.com/dscalzi/) and GuIx",
+  "author": "GuIx and Daniel Scalzi (https://github.com/dscalzi/)",
   "license": "UNLICENSED",
   "homepage": "https://github.com/GuIx-GitHub/ProjectGenesisLauncher",
   "bugs": {
@@ -39,7 +39,8 @@
     "howler": "^2.2.3",
     "jquery": "^3.7.0",
     "play-sound": "^1.1.6",
-    "semver": "^7.5.4"
+    "semver": "^7.5.4",
+    "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
     "electron": "^26.0.0",

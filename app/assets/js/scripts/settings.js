@@ -629,7 +629,7 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGOUT, (_, ...arguments_) => {
         const isLastAccount = arguments_[2]
         const prevSelAcc = ConfigManager.getSelectedAccount()
 
-        msftLogoutLogger.info('Logout Successful. uuid:', uuid)
+        msftLogoutLogger.info('Déconnexion réussie. uuid:', uuid)
         
         AuthManager.removeMicrosoftAccount(uuid)
             .then(() => {

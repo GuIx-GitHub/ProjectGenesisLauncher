@@ -57,8 +57,8 @@ async function activity() {
     if (!RPC) return;
 
     RPC.setActivity({
-        details: "Joue à Project Genesis",
-        state: "Project Genesis Launcher",
+        details: "Project Genesis Launcher",
+        state: "Dev Release - 1.0.5",
         largeImageKey: 'projectgenesis',
         startTimestamp: new Date().getTime(),
     });

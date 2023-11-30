@@ -135,6 +135,12 @@ document.getElementById('settingsMediaButton').onclick = async e => {
     switchView(getCurrentView(), VIEWS.settings)
 }
 
+// Bind discord button
+document.getElementById('discordMediaButton').onclick = async e => {
+    await prepareSettings()
+    switchView(getCurrentView(), VIEWS.discord)
+}
+
 // Bind avatar overlay button.
 document.getElementById('avatarOverlay').onclick = async e => {
     await prepareSettings()
